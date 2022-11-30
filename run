@@ -1,2 +1,2 @@
-#!/bin/bash
-ts-node "src/day-$1/index.ts"
+#!/bin/sh
+npx ts-node "src/day-$1/index.ts"
