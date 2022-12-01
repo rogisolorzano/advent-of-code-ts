@@ -3,9 +3,7 @@ import { splitOn, getAllLines, sum, max, last, sort, parseNumbers } from '../uti
 async function start() {
   const calories = await getAllLines(__dirname, 'input.txt');
 
-  const totals = splitOn(calories, c => c === '')
-    .map(parseNumbers)
-    .map(sum);
+  const totals = splitOn(calories, c => c === '').map(c => sum(parseNumbers(c)));
 
   const largestSums = sum(last(sort(totals), 3));
 
