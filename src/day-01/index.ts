@@ -1,7 +1,16 @@
-const logHello = async () => console.log('Hello world!');
+import { splitOn, getAllLines, sum, max, last, sort, parseNumbers } from '../utils';
 
 async function start() {
-  await logHello();
+  const calories = await getAllLines(__dirname, 'input.txt');
+
+  const totals = splitOn(calories, c => c === '')
+    .map(parseNumbers)
+    .map(sum);
+
+  const largestSums = sum(last(sort(totals), 3));
+
+  console.log('Part 1', max(totals));
+  console.log('Part 2', largestSums);
 }
 
 start();
