@@ -28,3 +28,18 @@ export const splitOn = <T>(arr: T[], predicate: (v: T) => boolean): T[][] =>
       [[]] as T[][],
     )
     .filter(a => a.length > 0);
+
+/**
+ * Chunks an array into arrays of n size.
+ */
+export const chunk = <T>(arr: T[], size: number) =>
+  arr.reduce((chunks, item) => {
+    const currentChunk = lastItem(chunks);
+
+    if (currentChunk?.length < size) {
+      currentChunk.push(item);
+    } else {
+      chunks.push([item]);
+    }
+    return chunks;
+  }, [] as T[][]);
