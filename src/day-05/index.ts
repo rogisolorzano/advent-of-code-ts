@@ -36,26 +36,6 @@ const buildStackInstruction = (instructionLine: string): StackInstruction => {
   };
 };
 
-const moveItemsOneByOne = <T>(from: Stack<T>, to: Stack<T>, amount: number) => {
-  let moved = 0;
-  while (moved < amount) {
-    const item = from.pop();
-    if (item === undefined) break;
-    to.add(item);
-    moved++;
-  }
-};
-
-const moveItemsInGroup = <T>(from: Stack<T>, to: Stack<T>, amount: number) => {
-  const toMove = [];
-  while (toMove.length < amount) {
-    const item = from.pop();
-    if (item === undefined) break;
-    toMove.push(item);
-  }
-  toMove.reverse().forEach(item => to.add(item));
-};
-
 async function start() {
   const lines = await getAllLines(__dirname, 'input.txt');
   const [stackLines, instructionLines] = splitOn(lines, line => line === '');
@@ -69,8 +49,10 @@ async function start() {
   const instructions = instructionLines.map(buildStackInstruction);
 
   instructions.forEach(({ from, to, amount }) => {
-    moveItemsOneByOne(stacks.get(from)!, stacks.get(to)!, amount);
-    moveItemsInGroup(stacksTwo.get(from)!, stacksTwo.get(to)!, amount);
+    const itemsOne = stacks.get(from)!.popMany(amount);
+    const itemsTwo = stacksTwo.get(from)!.popMany(amount);
+    stacks.get(to)?.addMany(itemsOne);
+    stacksTwo.get(to)?.addMany(itemsTwo.reverse());
   });
 
   console.log('Part 1', [...stacks.values()].map(s => s.peek()).join(''));
