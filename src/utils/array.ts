@@ -13,11 +13,11 @@ export const parseNumbers = <T>(arr: T[]): number[] => arr.map(n => Number(n));
  * @param arr The array to split.
  * @param predicate Receives the current item and returns true if the split should happen at that item.
  */
-export const splitOn = <T>(arr: T[], predicate: (v: T) => boolean): T[][] =>
+export const splitOn = <T>(arr: T[], predicate: (v: T, i: number) => boolean): T[][] =>
   arr
     .reduce(
-      (chunks, item) => {
-        if (predicate(item)) {
+      (chunks, item, i) => {
+        if (predicate(item, i)) {
           chunks.push([]);
         } else {
           lastItem(chunks).push(item);
