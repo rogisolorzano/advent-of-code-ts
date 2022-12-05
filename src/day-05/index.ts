@@ -28,11 +28,11 @@ const buildStackMap = (stackGrid: string[][][]): StackMap => {
 
 const buildStackInstruction = (instructionLine: string): StackInstruction => {
   const matches = instructionLine.matchAll(/move (?<amount>\d+) from (?<from>\d+) to (?<to>\d+)/g);
-  const groups = matches.next().value.groups;
+  const { amount, from, to } = matches.next().value.groups;
   return {
-    amount: Number(groups.amount),
-    from: groups.from,
-    to: groups.to,
+    amount: Number(amount),
+    from,
+    to,
   };
 };
 
