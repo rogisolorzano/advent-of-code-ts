@@ -1,12 +1,10 @@
-import { getAllLines, window, countCharacterOccurrences } from '../utils';
+import { getAllLines, window } from '../utils';
 
 const findFirstUniqueWindow = (signal: string, windowSize: number): number | undefined => {
   const windows = window([...signal], windowSize);
 
   for (let i = 0; i < windows.length; i++) {
-    const occurrences = countCharacterOccurrences(windows[i].join(''));
-
-    if (Object.values(occurrences).every(count => count === 1)) {
+    if ([...new Set(windows[i])].length === windowSize) {
       return i + windowSize;
     }
   }
