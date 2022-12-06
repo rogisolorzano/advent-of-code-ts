@@ -43,3 +43,22 @@ export const chunk = <T>(arr: T[], size: number) =>
     }
     return chunks;
   }, [] as T[][]);
+
+/**
+ * Creates a rolling window of arrays based on a size.
+ *
+ * @param arr The array to create the window for.
+ * @param size The window sizes.
+ * @returns The windowed array.
+ */
+export const window = <T>(arr: T[], size: number): T[][] => {
+  if (size <= 0 || arr.length < size) return [];
+
+  const result = [];
+
+  for (let i = 0; i < arr.length - size + 1; i++) {
+    result.push(arr.slice(i, size + i));
+  }
+
+  return result;
+};
