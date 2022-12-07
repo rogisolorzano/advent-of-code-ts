@@ -1,11 +1,13 @@
-import { getAllLines, window } from '../utils';
+import { WindowIterator } from '../core';
+import { getAllLines } from '../utils';
 
 const findFirstUniqueWindow = (signal: string, windowSize: number): number | undefined => {
-  const windows = window([...signal], windowSize);
+  const windowIterator = new WindowIterator([...signal], windowSize);
 
-  for (let i = 0; i < windows.length; i++) {
-    if ([...new Set(windows[i])].length === windowSize) {
-      return i + windowSize;
+  while (windowIterator.hasNext()) {
+    const window = windowIterator.next();
+    if ([...new Set(window)].length === windowSize) {
+      return windowIterator.currentWindowIndex + windowSize;
     }
   }
 };
