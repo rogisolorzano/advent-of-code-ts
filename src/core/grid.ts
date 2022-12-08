@@ -17,6 +17,13 @@ export class Point implements IQueueable {
   }
 }
 
+export enum NeighborDirection {
+  Top,
+  Bottom,
+  Left,
+  Right,
+}
+
 export class Grid {
   constructor(readonly points: Point[][]) {}
 
@@ -39,6 +46,27 @@ export class Grid {
       .map(([x, y]) => this.get(x, y));
   }
 
+  protected getNeighbor(point: Point, direction: NeighborDirection): Point | undefined {
+    const newPoint = point.copyWith({});
+
+    switch (direction) {
+      case NeighborDirection.Top:
+        newPoint.y -= 1;
+        break;
+      case NeighborDirection.Bottom:
+        newPoint.y += 1;
+        break;
+      case NeighborDirection.Left:
+        newPoint.x -= 1;
+        break;
+      case NeighborDirection.Right:
+        newPoint.x += 1;
+        break;
+    }
+
+    return this.hasPoint(newPoint.x, newPoint.y) ? this.get(newPoint.x, newPoint.y) : undefined;
+  }
+
   protected hasPoint(x: number, y: number) {
     return isDefined(this.points[y]) && isDefined(this.points[y][x]);
   }
@@ -49,5 +77,11 @@ export class Grid {
 
   protected sum() {
     return this.points.reduce((sum, points) => sum + points.reduce((s, p) => (s += p.value), 0), 0);
+  }
+
+  protected isOnEdge(point: Point) {
+    return (
+      point.y === 0 || point.x === 0 || point.y === this.points.length - 1 || point.x === this.points[0]?.length - 1
+    );
   }
 }

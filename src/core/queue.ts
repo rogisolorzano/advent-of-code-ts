@@ -9,7 +9,8 @@ export interface IQueue<T> {
 
 export class Queue<T extends IQueueable> implements IQueue<T> {
   private qMap = new Map<string, T>();
-  private q: T[] = [];
+
+  constructor(private readonly q: T[] = []) {}
 
   dequeue(): T | undefined {
     return this.q.shift();
