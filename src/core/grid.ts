@@ -18,10 +18,10 @@ export class Point implements IQueueable {
 }
 
 export enum NeighborDirection {
-  Top,
-  Bottom,
-  Left,
-  Right,
+  Top = 'top',
+  Bottom = 'bottom',
+  Left = 'left',
+  Right = 'right',
 }
 
 export class Grid {

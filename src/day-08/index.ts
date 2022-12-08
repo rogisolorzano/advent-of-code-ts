@@ -20,24 +20,13 @@ class TreeGrid extends Grid {
       const point = queue.dequeue()!;
       const neighbor = this.getNeighbor(point, direction);
 
-      if (!neighbor) {
-        return { lastTreePoint: point, treesSeen };
-      }
-
-      if (neighbor.value < treePoint.value) {
-        queue.enqueue(neighbor);
-      }
+      if (!neighbor) return { lastTreePoint: point, treesSeen };
+      if (neighbor.value < treePoint.value) queue.enqueue(neighbor);
 
       treesSeen++;
     }
 
     return { treesSeen, lastTreePoint: treePoint };
-  }
-
-  private searchTrees(treePoint: Point): TreeSearchResult[] {
-    return [NeighborDirection.Top, NeighborDirection.Bottom, NeighborDirection.Left, NeighborDirection.Right].map(d =>
-      this.searchTreesInDirection(treePoint, d),
-    );
   }
 
   public analyzeTreeMap(): TreeMapAnalysis {
@@ -46,7 +35,7 @@ class TreeGrid extends Grid {
 
     for (const pointsY of this.points) {
       for (const currentPoint of pointsY) {
-        const results = this.searchTrees(currentPoint);
+        const results = Object.values(NeighborDirection).map(d => this.searchTreesInDirection(currentPoint, d));
         const hasTreeOnEdge = results.some(r => this.isOnEdge(r.lastTreePoint));
         const scenicScore = results.reduce((score, r) => score * r.treesSeen, 1);
 
