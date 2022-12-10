@@ -1,6 +1,10 @@
 import { IQueueable } from './queue';
 import { isDefined } from '../utils';
 
+type X = number;
+type Y = number;
+export type Translation = [X, Y];
+
 export class Point implements IQueueable {
   constructor(public x: number, public y: number, public value: number) {}
 
@@ -14,6 +18,32 @@ export class Point implements IQueueable {
       isDefined(updates.y) ? updates.y : this.y,
       isDefined(updates.value) ? updates.value : this.value,
     );
+  }
+
+  isOn(point: Point): boolean {
+    return this.x === point.x && this.y === point.y;
+  }
+
+  isNeighboring(point: Point): boolean {
+    return [
+      [this.x, this.y - 1],
+      [this.x + 1, this.y],
+      [this.x, this.y + 1],
+      [this.x - 1, this.y],
+      [this.x - 1, this.y - 1],
+      [this.x + 1, this.y - 1],
+      [this.x + 1, this.y + 1],
+      [this.x - 1, this.y + 1],
+    ].some(p => point.x === p[0] && point.y === p[1]);
+  }
+
+  translate(translation: Translation) {
+    this.x += translation[0];
+    this.y += translation[1];
+  }
+
+  differenceWith(point: Point): Translation {
+    return [this.x - point.x, this.y - point.y];
   }
 }
 
