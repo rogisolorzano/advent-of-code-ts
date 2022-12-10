@@ -1,4 +1,4 @@
-import { chunk, getAllLines, lastItem, sum } from '../utils';
+import { chunk, getAllLines, sum } from '../utils';
 import { Range } from '../core';
 
 interface Instruction {
@@ -12,7 +12,6 @@ type Pixel = '.' | '#';
 class CPU {
   cycle = 1;
   register = 1;
-  nextFreeCycle = 0;
   signalReadings: number[] = [];
   pixels: Pixel[] = [];
 
@@ -22,18 +21,13 @@ class CPU {
     this.readSignal();
     this.writePixel();
 
-    const instruction = this.instructions[0];
-
-    instruction.cyclesNeeded--;
-
-    if (instruction.cyclesNeeded === 0) {
-      if (instruction.type === 'addx') {
-        this.register += instruction.value!;
-      }
-      this.instructions.shift();
-    }
-
     this.cycle++;
+    this.instructions[0].cyclesNeeded--;
+    const { cyclesNeeded, value, type } = this.instructions[0];
+
+    if (cyclesNeeded > 0) return;
+    if (type === 'addx') this.register += value!;
+    this.instructions.shift();
   }
 
   process() {
