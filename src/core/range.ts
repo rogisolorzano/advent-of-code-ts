@@ -1,6 +1,10 @@
 export class Range {
   constructor(private readonly start: number, private readonly end: number) {}
 
+  containsValue(num: number): boolean {
+    return this.start <= num && num <= this.end;
+  }
+
   contains(range: Range): boolean {
     return this.start <= range.start && this.end >= range.end;
   }
