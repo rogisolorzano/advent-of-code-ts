@@ -75,7 +75,7 @@ class MonkeySimulation {
   constructor(public monkeys: Monkey[], public worryReducer: WorryReducer) {}
 
   simulateRound() {
-    for (const monkey of this.monkeys.values()) {
+    for (const monkey of this.monkeys) {
       monkey.inspectItems(this.worryReducer).forEach(r => this.throwItemTo(r.throwTo, r.item));
     }
     this.currentRound++;
