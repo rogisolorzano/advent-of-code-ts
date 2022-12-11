@@ -1,4 +1,4 @@
-import { chunk, getAllLines, sum } from '../utils';
+import { chunk, getAllLines, sum, whileNotEmpty } from '../utils';
 import { Range } from '../core';
 
 interface Instruction {
@@ -20,31 +20,32 @@ class CPU {
   tick() {
     this.readSignal();
     this.writePixel();
-
+    this.executeInstruction();
     this.cycle++;
-    this.instructions[0].cyclesNeeded--;
-    const { cyclesNeeded, value, type } = this.instructions[0];
-
-    if (cyclesNeeded > 0) return;
-    if (type === 'addx') this.register += value!;
-    this.instructions.shift();
   }
 
   process() {
-    while (this.instructions.length > 0) {
-      this.tick();
-    }
+    whileNotEmpty(this.instructions, () => this.tick());
   }
 
   private writePixel() {
-    const registerRange = new Range(this.register - 1, this.register + 1);
-    this.pixels.push(registerRange.containsValue((this.cycle % 40) - 1) ? '#' : '.');
+    const range = new Range(this.register - 1, this.register + 1);
+    this.pixels.push(range.containsValue((this.cycle % 40) - 1) ? '#' : '.');
   }
 
   private readSignal() {
     if ((this.cycle - 20) % 40 === 0) {
       this.signalReadings.push(this.cycle * this.register);
     }
+  }
+
+  private executeInstruction() {
+    const instruction = this.instructions[0];
+    instruction.cyclesNeeded--;
+
+    if (instruction.cyclesNeeded > 0) return;
+    if (instruction.type === 'addx') this.register += instruction.value!;
+    this.instructions.shift();
   }
 }
 

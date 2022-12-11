@@ -7,6 +7,12 @@ export const last = <T>(arr: T[], n: number) => arr.slice(-n);
 
 export const parseNumbers = <T>(arr: T[]): number[] => arr.map(n => Number(n));
 
+export const whileNotEmpty = <T>(arr: T[], action: () => void) => {
+  while (arr.length > 0) {
+    action();
+  }
+};
+
 /**
  * Split arrays based on a predicate.
  *
