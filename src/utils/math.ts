@@ -1,4 +1,5 @@
 export const sum = (a: number[]) => a.reduce((sum, n) => sum + n, 0);
+export const product = (a: number[]) => a.reduce((p, n) => p * n, 1);
 export const max = (a: number[]) => Math.max(...a);
 
 export const count = <T>(a: T[], predicate: (v: T) => boolean) =>

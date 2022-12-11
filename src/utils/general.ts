@@ -8,6 +8,14 @@ export const invert = <K extends keyof any, V extends keyof any>(map: Record<K, 
     return inverted;
   }, {} as Record<V, K>);
 
+export const times = <T>(n: number, operation: () => T): T[] => {
+  const results = [];
+  for (let i = 0; i < n; i++) {
+    results.push(operation());
+  }
+  return results;
+};
+
 type Creator<V> = () => V;
 
 export const getOrCreate = <K, V>(map: Map<K, V>, key: K, creator: Creator<V>): V => {
