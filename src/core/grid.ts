@@ -1,14 +1,16 @@
 import { IQueueable } from './queue';
 import { isDefined } from '../utils';
+import { PriorityQueue } from '.';
 
 type X = number;
 type Y = number;
 export type Translation = [X, Y];
+export type PointString = string;
 
 export class Point implements IQueueable {
   constructor(public x: number, public y: number, public value: number) {}
 
-  toString() {
+  toString(): PointString {
     return `${this.x},${this.y}`;
   }
 
@@ -54,10 +56,22 @@ export enum NeighborDirection {
   Right = 'right',
 }
 
+interface ShortestPathInfo {
+  pointString: PointString;
+  distanceFromStart: number;
+  visitedFrom?: Point;
+}
+
+interface DijkstraOptions {
+  isTargetPoint?: (point: Point) => boolean;
+  getWeight?: (point: Point) => number;
+  neighborFilter?: (neighborPoint: Point, currentPoint: Point) => boolean;
+}
+
 export class Grid {
   constructor(readonly points: Point[][]) {}
 
-  protected getNeighbors(point: Point, includeDiagonal = false): Point[] {
+  public getNeighbors(point: Point, includeDiagonal = false): Point[] {
     return [
       [point.x, point.y - 1],
       [point.x + 1, point.y],
@@ -76,7 +90,7 @@ export class Grid {
       .map(([x, y]) => this.get(x, y));
   }
 
-  protected getNeighbor(point: Point, direction: NeighborDirection): Point | undefined {
+  public getNeighbor(point: Point, direction: NeighborDirection): Point | undefined {
     const newPoint = point.copyWith({});
 
     switch (direction) {
@@ -97,21 +111,90 @@ export class Grid {
     return this.hasPoint(newPoint.x, newPoint.y) ? this.get(newPoint.x, newPoint.y) : undefined;
   }
 
-  protected hasPoint(x: number, y: number) {
+  public hasPoint(x: number, y: number) {
     return isDefined(this.points[y]) && isDefined(this.points[y][x]);
   }
 
-  protected get(x: number, y: number) {
+  public get(x: number, y: number) {
     return this.points[y][x];
   }
 
-  protected sum() {
+  public getFromString(str: PointString) {
+    const [x, y] = str.split(',').map(n => Number(n));
+    return this.get(x, y);
+  }
+
+  public sum() {
     return this.points.reduce((sum, points) => sum + points.reduce((s, p) => (s += p.value), 0), 0);
   }
 
-  protected isOnEdge(point: Point) {
+  public isOnEdge(point: Point) {
     return (
       point.y === 0 || point.x === 0 || point.y === this.points.length - 1 || point.x === this.points[0]?.length - 1
     );
+  }
+
+  forEachPoint(operator: (p: Point) => void) {
+    this.points.forEach(y => y.forEach(operator));
+  }
+
+  dijkstra(
+    startingPoint: Point,
+    { isTargetPoint, getWeight = () => 1, neighborFilter = () => true }: DijkstraOptions,
+  ): Map<PointString, ShortestPathInfo> {
+    const queue = new PriorityQueue<string>([]);
+    const pathInfoMap = new Map<string, ShortestPathInfo>();
+    const visited = new Set<PointString>();
+
+    this.forEachPoint(point => {
+      const pointString = point.toString();
+      const distanceFromStart = point.isOn(startingPoint) ? 0 : Infinity;
+
+      queue.enqueue({
+        value: pointString,
+        priority: distanceFromStart,
+      });
+      pathInfoMap.set(pointString, {
+        pointString,
+        distanceFromStart,
+      });
+    });
+
+    while (queue.length() > 0) {
+      const item = queue.dequeue()!;
+      const point = this.getFromString(item.value);
+
+      if (visited.has(item.value)) {
+        continue;
+      }
+
+      if (isTargetPoint && isTargetPoint(point)) {
+        break;
+      }
+
+      visited.add(item.value);
+
+      for (const neighborPoint of this.getNeighbors(point).filter(n => neighborFilter(n, point))) {
+        const neighborItem = pathInfoMap.get(neighborPoint.toString());
+
+        if (visited.has(neighborPoint.toString()) || !neighborItem) {
+          continue;
+        }
+
+        const newPriority = item.priority + getWeight(neighborPoint);
+
+        if (newPriority < neighborItem.distanceFromStart) {
+          queue.enqueue({
+            value: neighborItem.pointString,
+            priority: newPriority,
+          });
+          neighborItem.distanceFromStart = newPriority;
+          neighborItem.visitedFrom = point;
+          pathInfoMap.set(neighborItem.pointString, neighborItem);
+        }
+      }
+    }
+
+    return pathInfoMap;
   }
 }
