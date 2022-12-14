@@ -1,5 +1,5 @@
 import { Point, Translation } from '../core';
-import { getAllLines, window } from '../utils';
+import { from, getAllLines, window } from '../utils';
 
 enum Direction {
   Up = 'Up',
@@ -24,7 +24,7 @@ const directionTranslation: Record<Direction, Translation> = {
 
 const simulateRope = (knotCount: number, directions: Direction[]): number => {
   const tailVisited = new Set<string>();
-  const rope = Array.from({ length: knotCount }, (_, i) => new Point(0, 0, i));
+  const rope = from<Point>(knotCount, (_, i) => new Point(0, 0, i));
   const knotJoints = window(rope, 2);
 
   for (const direction of directions) {
@@ -53,7 +53,7 @@ const simulateRope = (knotCount: number, directions: Direction[]): number => {
 async function start() {
   const directions = (await getAllLines(__dirname, 'input.txt')).reduce((directions, line) => {
     const [direction, steps] = line.split(' ');
-    return [...directions, ...Array.from({ length: Number(steps) }, () => directionMap[direction])];
+    return [...directions, ...from(Number(steps), () => directionMap[direction])];
   }, [] as Direction[]);
 
   console.log('Part 1', simulateRope(2, directions));
