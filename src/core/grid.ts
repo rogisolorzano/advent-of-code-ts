@@ -1,5 +1,5 @@
 import { IQueueable } from './queue';
-import { isDefined } from '../utils';
+import { from, isDefined } from '../utils';
 import { PriorityQueue } from '.';
 
 type X = number;
@@ -132,6 +132,17 @@ export class Grid {
     return (
       point.y === 0 || point.x === 0 || point.y === this.points.length - 1 || point.x === this.points[0]?.length - 1
     );
+  }
+
+  updatePoint(point: Point) {
+    const relevantPoint = this.get(point.x, point.y);
+    if (!relevantPoint) return;
+    relevantPoint.value = point.value;
+  }
+
+  static ofSize(xSize: number, ySize: number, valueInit: (x: number, y: number) => number): Grid {
+    const points = from<Point[]>(ySize + 1, (_, y) => from(xSize + 1, (_, x) => new Point(x, y, valueInit(x, y))));
+    return new Grid(points);
   }
 
   forEachPoint(operator: (p: Point) => void) {

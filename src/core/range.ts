@@ -12,4 +12,14 @@ export class Range {
   overlapsWith(range: Range): boolean {
     return range.start <= this.end && range.end >= this.start;
   }
+
+  forEach(handler: (n: number) => void) {
+    for (let n = this.start; n <= this.end; n++) {
+      handler(n);
+    }
+  }
+
+  static from(n1: number, n2: number): Range {
+    return new Range(Math.min(n1, n2), Math.max(n1, n2));
+  }
 }
