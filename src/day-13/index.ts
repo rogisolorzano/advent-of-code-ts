@@ -1,41 +1,31 @@
-import { getAllLines, isNumber, splitOn, zip } from '../utils';
+import { getAllLines, isArray, isNumber, splitOn, zip } from '../utils';
 
 type PacketItem = number[] | number;
 type Packet = PacketItem[];
 enum ComparisonResult {
-  Correct = 'Correct',
-  Incorrect = 'Incorrect',
-  Undetermined = 'Undetermined',
+  Correct = -1,
+  Incorrect = 1,
+  Equal = 0,
 }
 
-const comparePackets = (left: Packet, right: Packet): ComparisonResult => {
-  for (const [leftItem, rightItem] of zip(left, right)) {
-    if (leftItem === undefined && rightItem === undefined) return ComparisonResult.Undetermined;
-    if (leftItem === undefined) return ComparisonResult.Correct;
-    if (rightItem === undefined) return ComparisonResult.Incorrect;
+const comparePackets = (leftPacket: Packet, rightPacket: Packet): ComparisonResult => {
+  for (const [left, right] of zip(leftPacket, rightPacket)) {
+    if (left === undefined) return ComparisonResult.Correct;
+    if (right === undefined) return ComparisonResult.Incorrect;
 
-    if (isNumber(leftItem) && isNumber(rightItem)) {
-      if (leftItem === rightItem) continue;
-      return leftItem < rightItem ? ComparisonResult.Correct : ComparisonResult.Incorrect;
+    if (isNumber(left) && isNumber(right)) {
+      if (left === right) continue;
+      return left < right ? ComparisonResult.Correct : ComparisonResult.Incorrect;
     }
 
-    const result = comparePackets(
-      Array.isArray(leftItem) ? leftItem : [leftItem],
-      Array.isArray(rightItem) ? rightItem : [rightItem],
-    );
+    const result = comparePackets(isArray(left) ? left : [left], isArray(right) ? right : [right]);
 
-    if (result !== ComparisonResult.Undetermined) {
+    if (result !== ComparisonResult.Equal) {
       return result;
     }
   }
 
-  return ComparisonResult.Undetermined;
-};
-
-const packetSorter = (left: Packet, right: Packet): number => {
-  const result = comparePackets(left, right);
-  if (result === ComparisonResult.Undetermined) return 0;
-  return result === ComparisonResult.Correct ? -1 : 1;
+  return ComparisonResult.Equal;
 };
 
 const separatorPackets: Packet[] = [[[2]], [[6]]];
@@ -51,7 +41,7 @@ async function start() {
     .reduce((sum, result, i) => sum + (result === ComparisonResult.Correct ? i + 1 : 0), 0);
 
   const decoderKey = allPackets
-    .sort(packetSorter)
+    .sort(comparePackets)
     .reduce((product, packet, i) => product * (separatorStrings.includes(JSON.stringify(packet)) ? i + 1 : 1), 1);
 
   console.log('Part 1', orderedPairsSum);

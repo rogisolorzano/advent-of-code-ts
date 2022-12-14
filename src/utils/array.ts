@@ -1,5 +1,6 @@
 export const sort = (values: number[]) => values.sort((a, b) => a - b);
 export const sortBy = <T>(values: T[], by: (v: T) => number) => values.sort((a, b) => by(a) - by(b));
+export const isArray = (values: unknown): values is unknown[] => Array.isArray(values);
 
 export const lastIndex = <T>(arr: T[]): number => arr.length - 1;
 export const lastItem = <T>(arr: T[]): T => arr[lastIndex(arr)];
