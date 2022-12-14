@@ -8,7 +8,7 @@ enum ComparisonResult {
   Undetermined = 'Undetermined',
 }
 
-const comparePairs = (left: Packet, right: Packet): ComparisonResult => {
+const comparePackets = (left: Packet, right: Packet): ComparisonResult => {
   for (const [leftItem, rightItem] of zip(left, right)) {
     if (leftItem === undefined && rightItem === undefined) return ComparisonResult.Undetermined;
     if (leftItem === undefined) return ComparisonResult.Correct;
@@ -19,7 +19,7 @@ const comparePairs = (left: Packet, right: Packet): ComparisonResult => {
       return leftItem < rightItem ? ComparisonResult.Correct : ComparisonResult.Incorrect;
     }
 
-    const result = comparePairs(
+    const result = comparePackets(
       Array.isArray(leftItem) ? leftItem : [leftItem],
       Array.isArray(rightItem) ? rightItem : [rightItem],
     );
@@ -33,7 +33,7 @@ const comparePairs = (left: Packet, right: Packet): ComparisonResult => {
 };
 
 const packetSorter = (left: Packet, right: Packet): number => {
-  const result = comparePairs(left, right);
+  const result = comparePackets(left, right);
   if (result === ComparisonResult.Undetermined) return 0;
   return result === ComparisonResult.Correct ? -1 : 1;
 };
@@ -47,7 +47,7 @@ async function start() {
   const allPackets = [...pairs.flatMap(p => p), ...separatorPackets];
 
   const orderedPairsSum = pairs
-    .map(([left, right]) => comparePairs(left, right))
+    .map(([left, right]) => comparePackets(left, right))
     .reduce((sum, result, i) => sum + (result === ComparisonResult.Correct ? i + 1 : 0), 0);
 
   const decoderKey = allPackets
