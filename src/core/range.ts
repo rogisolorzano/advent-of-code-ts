@@ -19,7 +19,15 @@ export class Range {
     }
   }
 
-  static from(n1: number, n2: number): Range {
+  map<T>(handler: (n: number) => T): T[] {
+    const mapped = [];
+    for (let n = this.start; n <= this.end; n++) {
+      mapped.push(handler(n));
+    }
+    return mapped;
+  }
+
+  static ascending(n1: number, n2: number): Range {
     return new Range(Math.min(n1, n2), Math.max(n1, n2));
   }
 }

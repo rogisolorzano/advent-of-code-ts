@@ -7,19 +7,10 @@ enum Material {
   Sand,
 }
 
-const getRockPath = (start: Point, end: Point): Point[] => {
-  const points: Point[] = [];
-
-  if (start.x === end.x) {
-    Range.from(start.y, end.y).forEach(y => points.push(new Point(start.x, y, Material.Rock)));
-  }
-
-  if (start.y === end.y) {
-    Range.from(start.x, end.x).forEach(x => points.push(new Point(x, start.y, Material.Rock)));
-  }
-
-  return points;
-};
+const getRockPath = (start: Point, end: Point): Point[] =>
+  start.x === end.x
+    ? Range.ascending(start.y, end.y).map(y => new Point(start.x, y, Material.Rock))
+    : Range.ascending(start.x, end.x).map(x => new Point(x, start.y, Material.Rock));
 
 const getNextSandPoint = (cave: Grid): Point | undefined => {
   let current = new Point(500, -1, Material.Sand);
@@ -59,17 +50,16 @@ const pourSand = (cave: Grid, until?: (p: Point | undefined) => boolean): number
   return sandCount;
 };
 
-const createCave = (xBound: number, yBound: number, pathVertices: Point[][]): Grid => {
-  const cave = Grid.ofSize(xBound, yBound, () => Material.Air);
-
-  for (const vertices of pathVertices) {
-    const connectedVertices = window(vertices, 2);
-    const paths = connectedVertices.flatMap(([start, end]) => getRockPath(start, end));
-    paths.forEach(pathPoint => cave.updatePoint(pathPoint));
-  }
-
-  return cave;
-};
+const createCave = (xBound: number, yBound: number, pathVertices: Point[][]): Grid =>
+  pathVertices.reduce(
+    (cave, vertices) => {
+      window(vertices, 2)
+        .flatMap(([start, end]) => getRockPath(start, end))
+        .forEach(pathPoint => cave.updatePoint(pathPoint));
+      return cave;
+    },
+    Grid.ofSize(xBound, yBound, () => Material.Air),
+  );
 
 async function start() {
   const lines = await getAllLines(__dirname, 'input.txt');
