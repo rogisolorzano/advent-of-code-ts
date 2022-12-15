@@ -14,6 +14,15 @@ export class Point implements IQueueable {
     return `${this.x},${this.y}`;
   }
 
+  static fromString(str: PointString, value = 0): Point {
+    const [x, y] = str.split(',').map(n => Number(n));
+    return new Point(x, y, value);
+  }
+
+  copy(): Point {
+    return this.copyWith({});
+  }
+
   copyWith(updates: { x?: number; y?: number; value?: number }) {
     return new Point(
       isDefined(updates.x) ? updates.x : this.x,
@@ -39,13 +48,18 @@ export class Point implements IQueueable {
     ].some(p => point.x === p[0] && point.y === p[1]);
   }
 
-  translate(translation: Translation) {
+  translate(translation: Translation): Point {
     this.x += translation[0];
     this.y += translation[1];
+    return this;
   }
 
   differenceWith(point: Point): Translation {
     return [this.x - point.x, this.y - point.y];
+  }
+
+  manhattanDistanceTo(point: Point): number {
+    return Math.abs(this.x - point.x) + Math.abs(this.y - point.y);
   }
 }
 
