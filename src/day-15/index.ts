@@ -17,9 +17,9 @@ class Sensor {
   }
 
   scanInY(y: number): Point[] {
-    if (!Range.from(this.yBound.start, this.yBound.end).containsValue(y)) return [];
+    if (!this.yBound.containsValue(y)) return [];
 
-    return Range.from(this.xBound.start, this.xBound.end).reduce<Point[]>((positions, x) => {
+    return this.xBound.reduce<Point[]>((positions, x) => {
       const neighbor = new Point(x, y, 0);
 
       if (
