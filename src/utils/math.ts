@@ -8,3 +8,5 @@ export const count = <T>(a: T[], predicate: (v: T) => boolean) =>
 export const naturalNumbersSummation = (n: number) => (n * (n + 1)) / 2;
 
 export const isNumber = (n: unknown): n is number => typeof n === 'number';
+
+export const isNumeric = (n: unknown): boolean => !Number.isNaN(Number(n));
