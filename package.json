@@ -6,8 +6,9 @@
   "author": "Rogi Solorzano",
   "license": "ISC",
   "devDependencies": {
-    "ts-node": "^10.4.0",
-    "typescript": "^4.5.2",
-    "@types/node": "18.11.9"
+    "@types/node": "20.10.3",
+    "ts-node": "10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "5.3.3"
   }
 }

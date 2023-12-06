@@ -1,2 +1,2 @@
 #!/bin/sh
-npx ts-node "src/day-$1/index.ts"
+npx ts-node "src/$1/day-$2/index.ts"

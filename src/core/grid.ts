@@ -1,5 +1,5 @@
 import { IQueueable } from './queue';
-import { from, isDefined } from '../utils';
+import { from, isDefined } from '@utils';
 import { PriorityQueue } from '.';
 
 type X = number;

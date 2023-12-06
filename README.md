@@ -1,23 +1,19 @@
-## Advent of Code 2022
+## Advent of Code
 
-These are my [Advent of Code 2022](https://adventofcode.com/2022) solutions in Typescript.
+These are my [Advent of Code](https://adventofcode.com) solutions in Typescript.
 
 ### Getting started
 
 Install dependencies
 
 ```
-npm install
+npm i
 ```
 
-A `run` script is included at the root of the project to run the solutions by day.
+A `run` script is included at the root of the project to run the solutions by year and day.
 
 Example:
 
 ```
-./run 01
+./run 2023 01
 ```
-
-### Previous years
-
-- [2021](https://github.com/rogisolorzano/aoc-2021-ts)
