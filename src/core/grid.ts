@@ -7,8 +7,8 @@ type Y = number;
 export type Translation = [X, Y];
 export type PointString = string;
 
-export class Point implements IQueueable {
-  constructor(public x: number, public y: number, public value: number) {}
+export class Point<T = number> implements IQueueable {
+  constructor(public x: number, public y: number, public value: T) {}
 
   toString(): PointString {
     return `${this.x},${this.y}`;
@@ -19,11 +19,11 @@ export class Point implements IQueueable {
     return new Point(x, y, value);
   }
 
-  copy(): Point {
+  copy(): Point<T> {
     return this.copyWith({});
   }
 
-  copyWith(updates: { x?: number; y?: number; value?: number }) {
+  copyWith(updates: { x?: number; y?: number; value?: T }) {
     return new Point(
       isDefined(updates.x) ? updates.x : this.x,
       isDefined(updates.y) ? updates.y : this.y,
@@ -31,7 +31,7 @@ export class Point implements IQueueable {
     );
   }
 
-  isOn(point: Point): boolean {
+  isOn(point: Point<T>): boolean {
     return this.x === point.x && this.y === point.y;
   }
 
@@ -48,7 +48,7 @@ export class Point implements IQueueable {
     ].some(p => point.x === p[0] && point.y === p[1]);
   }
 
-  translate(translation: Translation): Point {
+  translate(translation: Translation): Point<T> {
     this.x += translation[0];
     this.y += translation[1];
     return this;
@@ -70,22 +70,22 @@ export enum NeighborDirection {
   Right = 'right',
 }
 
-interface ShortestPathInfo {
+interface ShortestPathInfo<T = number> {
   pointString: PointString;
   distanceFromStart: number;
-  visitedFrom?: Point;
+  visitedFrom?: Point<T>;
 }
 
-interface DijkstraOptions {
-  isTargetPoint?: (point: Point) => boolean;
-  getWeight?: (point: Point) => number;
-  neighborFilter?: (neighborPoint: Point, currentPoint: Point) => boolean;
+interface DijkstraOptions<T = number> {
+  isTargetPoint?: (point: Point<T>) => boolean;
+  getWeight?: (point: Point<T>) => number;
+  neighborFilter?: (neighborPoint: Point<T>, currentPoint: Point<T>) => boolean;
 }
 
-export class Grid {
-  constructor(readonly points: Point[][]) {}
+export class Grid<T = number> {
+  constructor(readonly points: Point<T>[][]) {}
 
-  public getNeighbors(point: Point, includeDiagonal = false): Point[] {
+  public getNeighbors(point: Point<T>, includeDiagonal = false): Point<T>[] {
     return [
       [point.x, point.y - 1],
       [point.x + 1, point.y],
@@ -104,7 +104,7 @@ export class Grid {
       .map(([x, y]) => this.get(x, y));
   }
 
-  public getNeighbor(point: Point, direction: NeighborDirection): Point | undefined {
+  public getNeighbor(point: Point, direction: NeighborDirection): Point<T> | undefined {
     const newPoint = point.copyWith({});
 
     switch (direction) {
@@ -129,7 +129,7 @@ export class Grid {
     return isDefined(this.points[y]) && isDefined(this.points[y][x]);
   }
 
-  public get(x: number, y: number) {
+  public get(x: number, y: number): Point<T> {
     return this.points[y][x];
   }
 
@@ -138,17 +138,13 @@ export class Grid {
     return this.get(x, y);
   }
 
-  public sum() {
-    return this.points.reduce((sum, points) => sum + points.reduce((s, p) => (s += p.value), 0), 0);
-  }
-
   public isOnEdge(point: Point) {
     return (
       point.y === 0 || point.x === 0 || point.y === this.points.length - 1 || point.x === this.points[0]?.length - 1
     );
   }
 
-  updatePoint(point: Point) {
+  updatePoint(point: Point<T>) {
     const relevantPoint = this.get(point.x, point.y);
     if (!relevantPoint) return;
     relevantPoint.value = point.value;
@@ -159,16 +155,16 @@ export class Grid {
     return new Grid(points);
   }
 
-  forEachPoint(operator: (p: Point) => void) {
+  forEachPoint(operator: (p: Point<T>) => void) {
     this.points.forEach(y => y.forEach(operator));
   }
 
   dijkstra(
-    startingPoint: Point,
-    { isTargetPoint, getWeight = () => 1, neighborFilter = () => true }: DijkstraOptions,
-  ): Map<PointString, ShortestPathInfo> {
+    startingPoint: Point<T>,
+    { isTargetPoint, getWeight = () => 1, neighborFilter = () => true }: DijkstraOptions<T>,
+  ): Map<PointString, ShortestPathInfo<T>> {
     const queue = new PriorityQueue<string>([]);
-    const pathInfoMap = new Map<string, ShortestPathInfo>();
+    const pathInfoMap = new Map<string, ShortestPathInfo<T>>();
     const visited = new Set<PointString>();
 
     this.forEachPoint(point => {

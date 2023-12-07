@@ -16,6 +16,10 @@ class OctopusGrid extends Grid {
     return [stepCount, flashCount];
   }
 
+  private sum() {
+    return this.points.reduce((sum, points) => sum + points.reduce((s, p) => (s += p.value), 0), 0);
+  }
+
   private step() {
     this.points.forEach(ps => ps.forEach(p => p.value++));
     return this.simulateFlashes();
