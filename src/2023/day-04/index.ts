@@ -13,15 +13,7 @@ const getCards = (lines: string[]): Card[] =>
       line
         .split(':')[1]
         .split('|')
-        .map(
-          numbers =>
-            new Set(
-              numbers
-                .split(' ')
-                .map(n => n.trim())
-                .filter(n => n !== ''),
-            ),
-        ),
+        .map(numbers => new Set(numbers.match(/\d+/g))),
     )
     .map(([winningNumbers, cardNumbers], index) => ({
       id: index + 1,
